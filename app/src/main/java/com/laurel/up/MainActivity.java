@@ -115,7 +115,6 @@ public class MainActivity extends Activity {
 //        new UploadFileToServer().execute();
         Log.d("line",""+f.indexOf(check.isChecked()));
 
-
     }
 }
 
