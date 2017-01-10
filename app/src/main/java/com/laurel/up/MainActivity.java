@@ -1,11 +1,16 @@
 package com.laurel.up;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.RecoverySystem;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,15 +23,31 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by SAIRAM on 1/10/2017.
  */
 
 public class MainActivity extends Activity {
+    private ProgressBar progressBar;
+    private TextView txtPercentage;
+    int statusCode;
+    long totalSize = 0;
+
     private int count;
     private Bitmap[] thumbnails;
     private boolean[] thumbnailsselection;
@@ -35,7 +56,6 @@ public class MainActivity extends Activity {
     CheckBox check;
     ArrayList<String> f = new ArrayList<String>();// list of file paths
     File[] listFile;
-
 
     /**
      * Called when the activity is first created.
@@ -96,8 +116,6 @@ public class MainActivity extends Activity {
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
-
-
             Bitmap myBitmap = BitmapFactory.decodeFile(f.get(position));
             holder.imageview.setImageBitmap(myBitmap);
             return convertView;
@@ -106,80 +124,78 @@ public class MainActivity extends Activity {
 
     class ViewHolder {
         ImageView imageview;
-
     }
 
     public void itemClicked(View v) {
         //code to check if this checkbox is checked!
         Toast.makeText(this, f.indexOf(check.isChecked()), Toast.LENGTH_LONG).show();
-//        new UploadFileToServer().execute();
-        Log.d("line",""+f.indexOf(check.isChecked()));
+        new UploadFileToServer().execute();
+        Log.d("line", "" + f.indexOf(check.isChecked()));
 
     }
-}
 
-  /* class UploadFileToServer extends AsyncTask<Void, Integer, String> {
 
-      private ProgressBar progressBar;
-      private TextView txtPercentage;
-       public static final String FILE_UPLOAD_URL = "http://videomon.southindia.cloudapp.azure.com/api/Upload/user/PostUserImage";
+    private class UploadFileToServer extends AsyncTask<Void, Integer, String> {
 
-    @Override
-    protected void onPreExecute() {
-        // setting progress bar to zero
+        public static final String FILE_UPLOAD_URL = "http://videomon.southindia.cloudapp.azure.com/api/Upload/user/PostUserImage";
 
-        progressBar.setProgress(0);
-        super.onPreExecute();
-    }
+        @Override
+        protected void onPreExecute() {
+            // setting progress bar to zero
 
-    @Override
-    protected void onProgressUpdate(Integer... progress) {
-        // Making progress bar visible
-        progressBar.setVisibility(View.VISIBLE);
+            progressBar.setProgress(0);
+            super.onPreExecute();
+        }
 
-        // updating progress bar value
-        progressBar.setProgress(progress[0]);
+        @Override
+        protected void onProgressUpdate(Integer... progress) {
+            // Making progress bar visible
+            progressBar.setVisibility(View.VISIBLE);
 
-        // updating percentage value
-        txtPercentage.setText(String.valueOf(progress[0]) + "%");
-    }
+            // updating progress bar value
+            progressBar.setProgress(progress[0]);
 
-    @Override
-    protected String doInBackground(Void... params) {
-        return uploadFile();
-    }
+            // updating percentage value
+            txtPercentage.setText(String.valueOf(progress[0]) + "%");
+        }
 
-    //       @SuppressWarnings("deprecation")
+        @Override
+        protected String doInBackground(Void... params) {
+            return uploadFile();
+        }
 
-    private String uploadFile() {
-        String responseString = null;
+        //       @SuppressWarnings("deprecation")
 
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost(FILE_UPLOAD_URL);
+        private String uploadFile() {
+            String responseString = null;
 
-        try {
-            *//*AndroidMultiPartEntity entity = new AndroidMultiPartEntity(
-                    new ProgressListener() {
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httppost = new HttpPost(FILE_UPLOAD_URL);
 
-                        public void transferred(long num) {
-                            publishProgress((int) ((num / (float) totalSize) * 100));
-                        }
-                    });
-*//*
-            File sourceFile = new File(filePath);
+            try {
 
-            // Adding file data to http body
+                AndroidMultiPartEntity entity = new AndroidMultiPartEntity(
+                        new AndroidMultiPartEntity.ProgressListener() {
 
-            entity.addPart("image", new FileBody(sourceFile));
+                            public void transferred(long num) {
+                                publishProgress((int) ((num / (float) totalSize) * 100));
+                            }
+                        });
 
-            totalSize = entity.getContentLength();
-            httppost.setEntity(entity);
+                File sourceFile = new File(android.os.Environment.getExternalStorageDirectory(), "/gStorage/snapshot/office.bmp");
 
-            // Making server call
-            HttpResponse response = httpclient.execute(httppost);
-            HttpEntity r_entity = response.getEntity();
+                // Adding file data to http body
 
-            statusCode = response.getStatusLine().getStatusCode();
+                entity.addPart("image", new FileBody(sourceFile));
+
+                totalSize = entity.getContentLength();
+                httppost.setEntity(entity);
+
+                // Making server call
+                HttpResponse response = httpclient.execute(httppost);
+                HttpEntity r_entity = response.getEntity();
+
+                statusCode = response.getStatusLine().getStatusCode();
 
 //                if (statusCode != 200) {
 //
@@ -189,29 +205,29 @@ public class MainActivity extends Activity {
 //                    responseString = "Attendance marked successfully";
 //                }
 
-            responseString = EntityUtils.toString(r_entity);
+                responseString = EntityUtils.toString(r_entity);
 
 
+            } catch (ClientProtocolException e) {
+                responseString = e.toString();
+            } catch (IOException e) {
+                responseString = e.toString();
+            }
 
-        } catch (ClientProtocolException e) {
-            responseString = e.toString();
-        } catch (IOException e) {
-            responseString = e.toString();
+            return responseString;
+
         }
 
-        return responseString;
+        @Override
+        protected void onPostExecute(String result) {
+            //Log.e(TAG, "Response from server: " + result);
 
-    }
+            //  showAlert(result);
+            // showing the s
+            // erver response in an alert dialog
 
-    @Override
-    protected void onPostExecute(String result) {
-        Log.e(TAG, "Response from server: " + result);
+            super.onPostExecute(result);
+        }
 
-        showAlert(result);
-        // showing the s
-        // erver response in an alert dialog
-
-        super.onPostExecute(result);
     }
 }
-*/
