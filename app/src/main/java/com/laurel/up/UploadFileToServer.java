@@ -58,13 +58,13 @@ public class UploadFileToServer extends AsyncTask<Void, Integer, String> {
     @Override
     protected void onProgressUpdate(Integer... progress) {
         // Making progress bar visible
-        progressBar.setVisibility(View.VISIBLE);
+      //  progressBar.setVisibility(View.VISIBLE);
 
         // updating progress bar value
-        progressBar.setProgress(progress[0]);
+      //  progressBar.setProgress(progress[0]);
 
         // updating percentage value
-        txtPercentage.setText(String.valueOf(progress[0]) + "%");
+        //txtPercentage.setText(String.valueOf(progress[0]) + "%");
     }
 
     @Override
@@ -91,7 +91,6 @@ public class UploadFileToServer extends AsyncTask<Void, Integer, String> {
 
             Log.e("line91","91");
             File sourceFile = new File(android.os.Environment.getExternalStorageDirectory(), "/gStorage/snapshot/office.jpg");
-
             // Adding file data to http body
             Log.e("line91","96");
             entity.addPart("image", new FileBody(sourceFile));
@@ -100,11 +99,13 @@ public class UploadFileToServer extends AsyncTask<Void, Integer, String> {
             httppost.setEntity(entity);
             Log.e("line91","101");
             // Making server call
-            HttpResponse response = httpclient.execute(httppost);
-            HttpEntity r_entity = response.getEntity();
-            Log.e("line91","105");
-            statusCode = response.getStatusLine().getStatusCode();
 
+                HttpResponse response = httpclient.execute(httppost);
+                HttpEntity r_entity = response.getEntity();
+                Log.e("line91", "105");
+
+
+//            statusCode = response.getStatusLine().getStatusCode();
 //                if (statusCode != 200) {
 //
 //                    responseString = response.getStatusLine().getReasonPhrase();
@@ -114,16 +115,21 @@ public class UploadFileToServer extends AsyncTask<Void, Integer, String> {
 //                }
             Log.e("line91","115");
             responseString = EntityUtils.toString(r_entity);
-
-
         } catch (ClientProtocolException e) {
+            Log.e("c ex",e.getMessage());
             responseString = e.toString();
         } catch (IOException e) {
+            Log.e("i ex",e.getMessage());
+
             responseString = e.toString();
+
         } catch (Exception e) {
+            Log.e(" ex",e.getMessage());
+
             e.printStackTrace();
         }
 
+      //  Log.e("128",responseString);
         return responseString;
 
     }
