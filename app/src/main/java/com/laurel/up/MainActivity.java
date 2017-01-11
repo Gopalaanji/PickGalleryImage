@@ -1,16 +1,10 @@
 package com.laurel.up;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.RecoverySystem;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,35 +13,16 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
-
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-
-import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by SAIRAM on 1/10/2017.
  */
 
 public class MainActivity extends Activity {
-    private ProgressBar progressBar;
-    private TextView txtPercentage;
-    int statusCode;
-    long totalSize = 0;
-
     private int count;
     private Bitmap[] thumbnails;
     private boolean[] thumbnailsselection;
@@ -56,6 +31,7 @@ public class MainActivity extends Activity {
     CheckBox check;
     ArrayList<String> f = new ArrayList<String>();// list of file paths
     File[] listFile;
+
 
     /**
      * Called when the activity is first created.
@@ -69,6 +45,23 @@ public class MainActivity extends Activity {
         check = (CheckBox) findViewById(R.id.itemCheckBox);
         imageAdapter = new ImageAdapter();
         imagegrid.setAdapter(imageAdapter);
+      /*  check.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+               // Toast.makeText(this, "hai", Toast.LENGTH_LONG).show();
+
+            }
+        });*/
+    }
+
+    public void itemClicked(View v) {
+        //code to check if this checkbox is checked!
+        CheckBox checkBox = (CheckBox) v;
+        if (checkBox.isChecked()) {
+            new UploadFileToServer().execute();
+            Toast.makeText(this, "Hai", Toast.LENGTH_LONG).show();
+        }
     }
 
     public void getFromSdcard() {
@@ -116,6 +109,8 @@ public class MainActivity extends Activity {
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
+
+
             Bitmap myBitmap = BitmapFactory.decodeFile(f.get(position));
             holder.imageview.setImageBitmap(myBitmap);
             return convertView;
@@ -124,110 +119,7 @@ public class MainActivity extends Activity {
 
     class ViewHolder {
         ImageView imageview;
-    }
 
-    public void itemClicked(View v) {
-        //code to check if this checkbox is checked!
-        Toast.makeText(this, f.indexOf(check.isChecked()), Toast.LENGTH_LONG).show();
-        new UploadFileToServer().execute();
-        Log.d("line", "" + f.indexOf(check.isChecked()));
-
-    }
-
-
-    private class UploadFileToServer extends AsyncTask<Void, Integer, String> {
-
-        public static final String FILE_UPLOAD_URL = "http://videomon.southindia.cloudapp.azure.com/api/Upload/user/PostUserImage";
-
-        @Override
-        protected void onPreExecute() {
-            // setting progress bar to zero
-
-            progressBar.setProgress(0);
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... progress) {
-            // Making progress bar visible
-            progressBar.setVisibility(View.VISIBLE);
-
-            // updating progress bar value
-            progressBar.setProgress(progress[0]);
-
-            // updating percentage value
-            txtPercentage.setText(String.valueOf(progress[0]) + "%");
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-            return uploadFile();
-        }
-
-        //       @SuppressWarnings("deprecation")
-
-        private String uploadFile() {
-            String responseString = null;
-
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(FILE_UPLOAD_URL);
-
-            try {
-
-                AndroidMultiPartEntity entity = new AndroidMultiPartEntity(
-                        new AndroidMultiPartEntity.ProgressListener() {
-
-                            public void transferred(long num) {
-                                publishProgress((int) ((num / (float) totalSize) * 100));
-                            }
-                        });
-
-                File sourceFile = new File(android.os.Environment.getExternalStorageDirectory(), "/gStorage/snapshot/office.bmp");
-
-                // Adding file data to http body
-
-                entity.addPart("image", new FileBody(sourceFile));
-
-                totalSize = entity.getContentLength();
-                httppost.setEntity(entity);
-
-                // Making server call
-                HttpResponse response = httpclient.execute(httppost);
-                HttpEntity r_entity = response.getEntity();
-
-                statusCode = response.getStatusLine().getStatusCode();
-
-//                if (statusCode != 200) {
-//
-//                    responseString = response.getStatusLine().getReasonPhrase();
-//                }
-//                else {
-//                    responseString = "Attendance marked successfully";
-//                }
-
-                responseString = EntityUtils.toString(r_entity);
-
-
-            } catch (ClientProtocolException e) {
-                responseString = e.toString();
-            } catch (IOException e) {
-                responseString = e.toString();
-            }
-
-            return responseString;
-
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            //Log.e(TAG, "Response from server: " + result);
-
-            //  showAlert(result);
-            // showing the s
-            // erver response in an alert dialog
-
-            super.onPostExecute(result);
-        }
 
     }
 }
