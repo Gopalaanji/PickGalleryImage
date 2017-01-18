@@ -160,7 +160,7 @@ public class UploadFileToServer extends AsyncTask<Void, Integer, String> {
 
     private void showAlert(String message) {
         try {
-          
+
             Log.e("message", message);
 
 
