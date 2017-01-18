@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent" android:layout_height="fill_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
 
-    <GridView
+    <!--<GridView
         android:id="@+id/PhoneImageGrid"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -11,6 +13,14 @@
         android:horizontalSpacing="10dp"
         android:numColumns="auto_fit"
         android:stretchMode="columnWidth"
-        android:verticalSpacing="10dp" />
+        android:verticalSpacing="10dp" />-->
+    <Button
+        android:layout_marginLeft="150dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="select"
+        android:text="Select Image" />
 
-</RelativeLayout>
+</LinearLayout>

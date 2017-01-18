@@ -1,13 +1,16 @@
 package com.laurel.up;
 
 import com.laurel.up.AndroidMultiPartEntity.ProgressListener;
+import com.nispok.snackbar.Snackbar;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -27,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 
 
+import static android.R.id.message;
 import static android.content.Context.MODE_PRIVATE;
 
 /**
@@ -50,7 +54,6 @@ public class UploadFileToServer extends AsyncTask<Void, Integer, String> {
     @Override
     protected void onPreExecute() {
         // setting progress bar to zero
-
         //  progressBar.setProgress(0);
         super.onPreExecute();
     }
@@ -58,10 +61,10 @@ public class UploadFileToServer extends AsyncTask<Void, Integer, String> {
     @Override
     protected void onProgressUpdate(Integer... progress) {
         // Making progress bar visible
-      //  progressBar.setVisibility(View.VISIBLE);
+        //  progressBar.setVisibility(View.VISIBLE);
 
         // updating progress bar value
-      //  progressBar.setProgress(progress[0]);
+        //  progressBar.setProgress(progress[0]);
 
         // updating percentage value
         //txtPercentage.setText(String.valueOf(progress[0]) + "%");
@@ -76,7 +79,6 @@ public class UploadFileToServer extends AsyncTask<Void, Integer, String> {
 
     private String uploadFile() {
         String responseString = null;
-
         HttpClient httpclient = new DefaultHttpClient();
         HttpPost httppost = new HttpPost(FILE_UPLOAD_URL);
 
@@ -88,21 +90,23 @@ public class UploadFileToServer extends AsyncTask<Void, Integer, String> {
                             publishProgress((int) ((num / (float) totalSize) * 100));
                         }
                     });
-
-            Log.e("line91","91");
-            File sourceFile = new File(android.os.Environment.getExternalStorageDirectory(), "/gStorage/snapshot/office.jpg");
+            String path = MainActivity.picturePath;
+            File sourceFile = new File(path);
+            Log.d("path", path);
+            Log.e("line91", "91");
+            // File sourceFile = new File(android.os.Environment.getExternalStorageDirectory(), "/gStorage/snapshot/office.jpg");
             // Adding file data to http body
-            Log.e("line91","96");
+            Log.e("line91", "96");
             entity.addPart("image", new FileBody(sourceFile));
 
             totalSize = entity.getContentLength();
             httppost.setEntity(entity);
-            Log.e("line91","101");
+            Log.e("line91", "101");
             // Making server call
 
-                HttpResponse response = httpclient.execute(httppost);
-                HttpEntity r_entity = response.getEntity();
-                Log.e("line91", "105");
+            HttpResponse response = httpclient.execute(httppost);
+            HttpEntity r_entity = response.getEntity();
+            Log.e("line91", "105");
 
 
 //            statusCode = response.getStatusLine().getStatusCode();
@@ -113,34 +117,34 @@ public class UploadFileToServer extends AsyncTask<Void, Integer, String> {
 //                else {
 //                    responseString = "Attendance marked successfully";
 //                }
-            Log.e("line91","115");
+            Log.e("line91", "115");
             responseString = EntityUtils.toString(r_entity);
         } catch (ClientProtocolException e) {
-            Log.e("c ex",e.getMessage());
+            Log.e("c ex", e.getMessage());
             responseString = e.toString();
         } catch (IOException e) {
-            Log.e("i ex",e.getMessage());
+            Log.e("i ex", e.getMessage());
 
             responseString = e.toString();
 
         } catch (Exception e) {
-            Log.e(" ex",e.getMessage());
+            Log.e(" ex", e.getMessage());
 
             e.printStackTrace();
         }
 
-      //  Log.e("128",responseString);
+        //  Log.e("128",responseString);
         return responseString;
 
     }
 
+    static String outmsg;
+
     @Override
     protected void onPostExecute(String result) {
         try {
-
-
-        Log.e("result",result);
-        showAlert(result);
+            Log.e("result", result);
+            showAlert(result);
 
         } catch (Exception e) {
             Log.e("excep148", e.getMessage());
@@ -149,11 +153,14 @@ public class UploadFileToServer extends AsyncTask<Void, Integer, String> {
         // erver response in an alert dialog
 
         super.onPostExecute(result);
+
+
     }
+
 
     private void showAlert(String message) {
         try {
-
+          
             Log.e("message", message);
 
 
