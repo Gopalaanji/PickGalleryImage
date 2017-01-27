@@ -4,7 +4,9 @@ import com.laurel.up.AndroidMultiPartEntity.ProgressListener;
 import com.nispok.snackbar.Snackbar;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -44,6 +46,8 @@ public class UploadFileToServer extends AsyncTask<Void, Integer, String> {
     public static final String IMAGE_DIRECTORY_NAME = "Android File Upload";
     public static final String SESSION_NO = "SESSION_NO";
     public static final String MAIN = "MAIN";
+
+    Context context;
 
     private ProgressBar progressBar;
     private TextView txtPercentage;
@@ -143,6 +147,10 @@ public class UploadFileToServer extends AsyncTask<Void, Integer, String> {
     @Override
     protected void onPostExecute(String result) {
         try {
+
+            if (result.equals("Image Updated Successfully.")) {
+                Toast.makeText(context,"Hai",Toast.LENGTH_LONG);
+            }
             Log.e("result", result);
             showAlert(result);
 
@@ -154,10 +162,7 @@ public class UploadFileToServer extends AsyncTask<Void, Integer, String> {
 
         super.onPostExecute(result);
 
-
     }
-
-
     private void showAlert(String message) {
         try {
 
