@@ -1,3 +1,53 @@
 <resources>
-    <string name="app_name">Up</string>
+    <string name="app_name">Uploding</string>
+
+
+
+    <string name="user_prompt">ComplaintTypeId</string>
+
+    <string-array name="user_arrays">
+        <item>Select Any One ComplaintTypeId</item>
+        <item>Absenteesim of door to door garbage collector</item>
+        <item>Absenteesim of sweepers</item>
+        <item>Bio Medical waste/Health hazard waste removal</item>
+        <item>Broken Bin</item>
+        <item>Burning of garbage</item>
+        <item>Complaints regarding burial ground</item>
+        <item>Complaints regarding Dispensary</item>
+        <item>Complaints regarding function Halls</item>
+        <item>Complaints regarding public toilets</item>
+        <item>Complaints regarding unauthorised restaurants</item>
+        <item>Death of Stray Animals</item>
+        <item>Desilting of Drain</item>
+        <item>Disposal of removed silt on the Road</item>
+        <item>Dog menace</item>
+        <item>Fevers - Dengue/Malaria/ Gastro-enteritis</item>
+        <item>Food adulteration: Road Side Eateries</item>
+        <item>Garbage lorry with out Net</item>
+        <item>Illegal draining of sewage to SWD/Open sit</item>
+        <item>Illegal slaughtering</item>
+        <item>Improper Sweeping</item>
+        <item>Issues relating to Vacant lands</item>
+        <item>Mosquito menace</item>
+        <item>Obstruction of Trees</item>
+        <item>Over flowing of garbage bins</item>
+        <item>Poor maintenance of Public toilets at Fuel stations</item>
+        <item>Provision of garbage bin</item>
+        <item>Removal of Debris</item>
+        <item>Removal of fallen trees</item>
+        <item>Removal of garbage</item>
+        <item>Public Health/Dengue/Malaria/Gastro-enteritis</item>
+        <item>Shifting of garbage bin</item>
+        <item>Spilling of Garbage from lorry</item>
+        <item>Stagnation of water</item>
+        <item>Stray cattle</item>
+        <item>Stray Pigs</item>
+        <item>Transfer Station Smell</item>
+        <item>Unauthorised sale of meat and meat product</item>
+        <item>Unauthorised tree Cutting</item>
+        <item>Unclaimed Dead Bodies</item>
+        <item>Issues regarding Slaughter House</item>
+        <item>Unhygienic and improper transport of meat and livestock</item>
+        <item>Unsanitary conditions on the road</item>
+    </string-array>
 </resources>

@@ -17,10 +17,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,7 +36,13 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
 /**
@@ -46,83 +54,51 @@ public class MainActivity extends Activity {
     private Bitmap[] thumbnails;
     private boolean[] thumbnailsselection;
     private String[] arrPath;
-    // private ImageAdapter imageAdapter;
+
     private static final int MY_INTENT_CLICK = 302;
     static String picturePath;
-    CheckBox check;
+    Spinner complaintTypeId;
     ArrayList<String> f = new ArrayList<String>();// list of file paths
     File[] listFile;
     public static final int REQUEST_CODE = 1;
+    ImageView imageView;
+    Button upload, selectimage;
 
-    /**
-     * Called when the activity is first created.
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getFromSdcard();
-        // GridView imagegrid = (GridView) findViewById(R.id.PhoneImageGrid);
-        // ImageView Image = (ImageView) findViewById(R.id.thumbImage);
-        // check = (CheckBox) findViewById(R.id.itemCheckBox);
-        //  imageAdapter = new ImageAdapter();
-        //  imagegrid.setAdapter(imageAdapter);
-      /*  check.setOnClickListener(new View.OnClickListener() {
+        imageView = (ImageView) findViewById(R.id.image);
+        complaintTypeId = (Spinner) findViewById(R.id.ctype);
+        selectimage = (Button) findViewById(R.id.select);
+        // getFromSdcard();
 
-            @Override
-            public void onClick(View v) {
-               // Toast.makeText(this, "hai", Toast.LENGTH_LONG).show();
-
-            }
-        });*/
-
-/*
-
-        Image.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // your code here
-            }
-        });
-*/
     }
 
-    // public static final REQUEST_CODE = 1;
+
     public void select(View view) {
 
-
-        File file = new File(android.os.Environment.getExternalStorageDirectory(), "/gStorage/snapshot");
+/*
+      File file = new File(android.os.Environment.getExternalStorageDirectory(), "/gStorage/snapshot");
         Intent intent = new Intent();
-       // intent.setType("*/*");
+
 
            Uri uri = Uri.parse(Environment.getExternalStorageDirectory().getPath()
                    + "/gStorage/snapshot");
            intent.setDataAndType(uri, "text/csv");
 
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select File"), MY_INTENT_CLICK);
-        // new UploadFileToServer().execute();
+        intent.setAction(Intent.ACTION_GET_CONTENT);*/
+//
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);//
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), MY_INTENT_CLICK);
+        // startActivityForResult(Intent.createChooser(intent, "Select File"), MY_INTENT_CLICK);
 
     }
 
-    public void itemClicked(View v) {
-        //code to check if this checkbox is checked!
-        CheckBox checkBox = (CheckBox) v;
-        if (checkBox.isChecked()) {
-            File file = new File(android.os.Environment.getExternalStorageDirectory(), "/gStorage/snapshot");
-            Intent intent = new Intent();
-            intent.setType("*/*");
-
-//            Uri uri = Uri.parse(Environment.getExternalStorageDirectory().getPath()
-//                    + "/gStorage/");
-//            intent.setDataAndType(uri, "text/csv");
-
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(intent, "Select File"), MY_INTENT_CLICK);
-            // new UploadFileToServer().execute();
-            Toast.makeText(this, "Hai", Toast.LENGTH_LONG).show();
-
-        }
-    }
+    static String destinationImagePath;
+    // String mSelectedImagePath;
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -137,7 +113,13 @@ public class MainActivity extends Activity {
                 picturePath = cursor.getString(columnIndex);
                 cursor.close();
                 Log.d("Picture Path", picturePath);
-                new UploadFileToServer().execute();
+//                imageView.setVisibility(View.VISIBLE);
+//                upload.setVisibility(View.VISIBLE);
+
+
+
+                imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+
 
             } catch (Exception e) {
                 Log.e("Path Error", e.toString());
@@ -145,99 +127,62 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void getFromSdcard() {
-        try {
-            File file = new File(android.os.Environment.getExternalStorageDirectory(), "/gStorage/snapshot");
+    int[] i = {0, 53, 52, 56, 78, 65, 58, 61, 133, 59, 60, 74, 24, 29, 64, 89, 90, 79, 35, 72, 77, 91, 63, 57, 49, 140, 51, 54, 30, 48, 62, 50, 81, 28, 70, 73, 80, 69, 42, 134, 68, 76, 67};
+    int complaintId;
 
-            if (file.isDirectory()) {
-                listFile = file.listFiles();
-                for (int i = 0; i < listFile.length; i++) {
+    public void upload(View view) {
+        if (complaintTypeId.getSelectedItemPosition() > 0) {
+            complaintId = i[complaintTypeId.getSelectedItemPosition()];
+            Log.e("complaintId", complaintId + "");
+            String mSelectedImagePath = picturePath;
+            System.out.println("mSelectedImagePath : " + mSelectedImagePath);
 
-                    f.add(listFile[i].getAbsolutePath());
-
+            try {
+                File sd = Environment.getExternalStorageDirectory();
+                if (sd.canWrite()) {
+                    System.out.println("(sd.canWrite()) = " + (sd.canWrite()));
+                    destinationImagePath = "/" + complaintId + "-VMC-20170129130015.jpg";   // this is the destination image path.
+                    File source = new File(mSelectedImagePath);
+                    File destination = new File(sd, destinationImagePath);
+                    if (source.exists()) {
+                        FileChannel src = new FileInputStream(source).getChannel();
+                        FileChannel dst = new FileOutputStream(destination).getChannel();
+                        dst.transferFrom(src, 0, src.size());       // copy the first file to second.....
+                        src.close();
+                        dst.close();
+                        Toast.makeText(getApplicationContext(), "Check the copy of the image in the same path as the gallery image. File is name file.jpg", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "SDCARD Not writable.", Toast.LENGTH_LONG).show();
                 }
+            } catch (Exception e) {
+                System.out.println("Error :" + e.getMessage());
+                Log.e("excepupload", e.getMessage() + "");
             }
-        } catch (Exception e) {
-            Log.e("ee", e.getMessage());
+
+
+            new UploadFileToServer().execute();
+        } else {
+            Toast.makeText(this, "please select ComplaintTypeId", Toast.LENGTH_LONG).show();
         }
-    }
 
-
-    /* public class ImageAdapter extends BaseAdapter {
-         private LayoutInflater mInflater;
-
-         public ImageAdapter() {
-             mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-         }
-
-         public int getCount() {
-             return f.size();
-         }
-
-         public Object getItem(int position) {
-             return position;
-         }
-
-         public long getItemId(int position) {
-             return position;
-         }
-
-        *//* public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder holder;
-            if (convertView == null) {
-                holder = new ViewHolder();
-                convertView = mInflater.inflate(
-                        R.layout.gelleryitem, null);
-                holder.imageview = (ImageView) convertView.findViewById(R.id.thumbImage);
-
-                convertView.setTag(holder);
-            } else {
-                holder = (ViewHolder) convertView.getTag();
-            }
-
-
-            Bitmap myBitmap = BitmapFactory.decodeFile(f.get(position));
-            holder.imageview.setImageBitmap(myBitmap);
-            return convertView;
-        }*//*
-    }
-*/
-    class ViewHolder {
-        ImageView imageview;
     }
 
     public class UploadFileToServer extends AsyncTask<Void, Integer, String> {
 
         public static final String FILE_UPLOAD_URL = "http://videomon.southindia.cloudapp.azure.com/api/Upload/user/PostUserImage";
 
-        // Directory name to store captured images and videos
-        public static final String IMAGE_DIRECTORY_NAME = "Android File Upload";
-        public static final String SESSION_NO = "SESSION_NO";
-        public static final String MAIN = "MAIN";
-
-        private ProgressBar progressBar;
-        private TextView txtPercentage;
         long totalSize = 0;
-        String shift, empno, empname, empid;
-        int statusCode;
 
         @Override
         protected void onPreExecute() {
-            // setting progress bar to zero
-            //  progressBar.setProgress(0);
+
             super.onPreExecute();
         }
 
         @Override
         protected void onProgressUpdate(Integer... progress) {
-            // Making progress bar visible
-            //  progressBar.setVisibility(View.VISIBLE);
 
-            // updating progress bar value
-            //  progressBar.setProgress(progress[0]);
-
-            // updating percentage value
-            //txtPercentage.setText(String.valueOf(progress[0]) + "%");
         }
 
         @Override
@@ -260,12 +205,14 @@ public class MainActivity extends Activity {
                                 publishProgress((int) ((num / (float) totalSize) * 100));
                             }
                         });
-                String path = MainActivity.picturePath;
+                String path = MainActivity.destinationImagePath;
+                path = "/storage/emulated/0/" + path;
+                Log.e("opath", path);
                 File sourceFile = new File(path);
+
+
                 Log.d("path", path);
                 Log.e("line91", "91");
-                // File sourceFile = new File(android.os.Environment.getExternalStorageDirectory(), "/gStorage/snapshot/office.jpg");
-                // Adding file data to http body
                 Log.e("line91", "96");
                 entity.addPart("image", new FileBody(sourceFile));
 
@@ -277,16 +224,6 @@ public class MainActivity extends Activity {
                 HttpResponse response = httpclient.execute(httppost);
                 HttpEntity r_entity = response.getEntity();
                 Log.e("line91", "105");
-
-
-//            statusCode = response.getStatusLine().getStatusCode();
-//                if (statusCode != 200) {
-//
-//                    responseString = response.getStatusLine().getReasonPhrase();
-//                }
-//                else {
-//                    responseString = "Attendance marked successfully";
-//                }
                 Log.e("line91", "115");
                 responseString = EntityUtils.toString(r_entity);
             } catch (ClientProtocolException e) {
@@ -303,7 +240,7 @@ public class MainActivity extends Activity {
                 e.printStackTrace();
             }
 
-            //  Log.e("128",responseString);
+
             return responseString;
 
         }
@@ -319,8 +256,6 @@ public class MainActivity extends Activity {
             } catch (Exception e) {
                 Log.e("excep148", e.getMessage());
             }
-            // showing the s
-            // erver response in an alert dialog
 
             super.onPostExecute(result);
 
@@ -330,39 +265,18 @@ public class MainActivity extends Activity {
 
         private void showAlert(String message) {
             try {
-
+                Toast.makeText(MainActivity.this, "Updated Successfully", Toast.LENGTH_LONG);
+            /*    imageView.setVisibility(View.GONE);
+                upload.setVisibility(View.GONE);*/
                 Log.e("message", message);
 
 
             } catch (Exception e) {
                 Log.e("excep", e.getMessage());
             }
-       /* AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setMessage("Successfully marked attendance").setTitle("Response from Servers")
 
-        message = statusCode == 200 ? "Succesfully marked attendance" : message;
-
-        builder.setMessage(message)
-                .setCancelable(false)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        if (statusCode == 200) {
-                            SharedPreferences.Editor editor;
-                            SharedPreferences pref;
-                            pref = getSharedPreferences(MAIN, MODE_PRIVATE);
-                            editor = pref.edit();
-                            editor.putInt(SESSION_NO, pref.getInt(SESSION_NO, 0) + 1);
-                            editor.commit();
-                        }
-                        // do nothing
-                    }
-                });
-        AlertDialog alert = builder.create();
-        alert.show();
-*/
         }
     }
-
 
 
 }
