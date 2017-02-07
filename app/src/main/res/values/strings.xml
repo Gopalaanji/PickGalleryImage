@@ -6,7 +6,7 @@
     <string name="user_prompt">ComplaintTypeId</string>
 
     <string-array name="user_arrays">
-        <item>Select Any One ComplaintTypeId</item>
+        <item>Select ComplaintType</item>
         <item>Absenteesim of door to door garbage collector</item>
         <item>Absenteesim of sweepers</item>
         <item>Bio Medical waste/Health hazard waste removal</item>

@@ -1,7 +1,9 @@
 package com.laurel.up;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -70,7 +72,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         imageView = (ImageView) findViewById(R.id.image);
         complaintTypeId = (Spinner) findViewById(R.id.ctype);
-        selectimage = (Button) findViewById(R.id.select);
+       /* selectimage = (Button) findViewById(R.id.select);*/
         // getFromSdcard();
 
     }
@@ -150,7 +152,7 @@ public class MainActivity extends Activity {
                         dst.transferFrom(src, 0, src.size());       // copy the first file to second.....
                         src.close();
                         dst.close();
-                        Toast.makeText(getApplicationContext(), "Check the copy of the image in the same path as the gallery image. File is name file.jpg", Toast.LENGTH_LONG).show();
+                        // Toast.makeText(getApplicationContext(), "Check the copy of the image in the same path as the gallery image. File is name file.jpg", Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), "SDCARD Not writable.", Toast.LENGTH_LONG).show();
@@ -249,6 +251,21 @@ public class MainActivity extends Activity {
         @Override
         protected void onPostExecute(String result) {
             try {
+                AlertDialog alertDialog;
+                alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+               // alertDialog.setTitle("The Process");
+                //  alertDialog.setIcon(R.drawable.success);
+                alertDialog.setCanceledOnTouchOutside(false);
+                alertDialog.setMessage("Grievance Successfully Created");
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent A = new Intent(MainActivity.this, MainActivity.class);
+                                startActivity(A);
+                                finish();
+                            }
+                        });
+                alertDialog.show();
 
                 Log.e("result", result);
                 showAlert(result);
@@ -265,12 +282,21 @@ public class MainActivity extends Activity {
 
         private void showAlert(String message) {
             try {
-                Toast.makeText(MainActivity.this, "Updated Successfully", Toast.LENGTH_LONG);
+
+                try {
+
+
+
+
+                    Toast.makeText(MainActivity.this, "Updated Successfully", Toast.LENGTH_LONG);
             /*    imageView.setVisibility(View.GONE);
                 upload.setVisibility(View.GONE);*/
-                Log.e("message", message);
+                    Log.e("message", message);
 
 
+                } catch (Exception e) {
+                    Log.e("hai", e.getMessage().toString());
+                }
             } catch (Exception e) {
                 Log.e("excep", e.getMessage());
             }
